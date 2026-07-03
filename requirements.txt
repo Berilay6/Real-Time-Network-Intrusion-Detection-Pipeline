@@ -1,0 +1,5 @@
+pandas
+datafusion
+kaggle
+confluent-kafka
+cassandra-driver
