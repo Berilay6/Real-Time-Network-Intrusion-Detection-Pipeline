@@ -1,79 +1,79 @@
-Bulunan dosya sayısı: 8
+Number of files found: 8
 
 === Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv ===
-  Satır: 225,745  |  Kolon: 79
-  Eksik/Bozuk Satır: 34 (%0.0151)
-  Zaman Atama Süresi: 0.0441 sn
+  Rows: 225,745  |  Columns: 79
+  Missing/Corrupted Rows: 34 (0.0151%)
+  Timestamp Injection Duration: 0.0444 sec
 ----------------------------------------
 === Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv ===
-  Satır: 286,467  |  Kolon: 79
-  Eksik/Bozuk Satır: 371 (%0.1295)
-  Zaman Atama Süresi: 0.0552 sn
+  Rows: 286,467  |  Columns: 79
+  Missing/Corrupted Rows: 371 (0.1295%)
+  Timestamp Injection Duration: 0.0530 sec
 ----------------------------------------
 === Friday-WorkingHours-Morning.pcap_ISCX.csv ===
-  Satır: 191,033  |  Kolon: 79
-  Eksik/Bozuk Satır: 122 (%0.0639)
-  Zaman Atama Süresi: 0.0361 sn
+  Rows: 191,033  |  Columns: 79
+  Missing/Corrupted Rows: 122 (0.0639%)
+  Timestamp Injection Duration: 0.0361 sec
 ----------------------------------------
 === Monday-WorkingHours.pcap_ISCX.csv ===
-  Satır: 529,918  |  Kolon: 79
-  Eksik/Bozuk Satır: 437 (%0.0825)
-  Zaman Atama Süresi: 0.0997 sn
+  Rows: 529,918  |  Columns: 79
+  Missing/Corrupted Rows: 437 (0.0825%)
+  Timestamp Injection Duration: 0.1005 sec
 ----------------------------------------
 === Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv ===
-  Satır: 288,602  |  Kolon: 79
-  Eksik/Bozuk Satır: 207 (%0.0717)
-  Zaman Atama Süresi: 0.0547 sn
+  Rows: 288,602  |  Columns: 79
+  Missing/Corrupted Rows: 207 (0.0717%)
+  Timestamp Injection Duration: 0.0558 sec
 ----------------------------------------
 === Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv ===
-  Satır: 170,366  |  Kolon: 79
-  Eksik/Bozuk Satır: 135 (%0.0792)
-  Zaman Atama Süresi: 0.0311 sn
+  Rows: 170,366  |  Columns: 79
+  Missing/Corrupted Rows: 135 (0.0792%)
+  Timestamp Injection Duration: 0.0331 sec
 ----------------------------------------
 === Tuesday-WorkingHours.pcap_ISCX.csv ===
-  Satır: 445,909  |  Kolon: 79
-  Eksik/Bozuk Satır: 264 (%0.0592)
-  Zaman Atama Süresi: 0.0857 sn
+  Rows: 445,909  |  Columns: 79
+  Missing/Corrupted Rows: 264 (0.0592%)
+  Timestamp Injection Duration: 0.0824 sec
 ----------------------------------------
 === Wednesday-workingHours.pcap_ISCX.csv ===
-  Satır: 692,703  |  Kolon: 79
-  Eksik/Bozuk Satır: 1,297 (%0.1872)
-  Zaman Atama Süresi: 0.1306 sn
+  Rows: 692,703  |  Columns: 79
+  Missing/Corrupted Rows: 1,297 (0.1872%)
+  Timestamp Injection Duration: 0.1366 sec
 ----------------------------------------
 
 ==================================================
-=== GENEL TOPLAM SONUÇLAR (TÜM DOSYALAR) ===
+=== GRAND TOTAL RESULTS (ALL FILES) ===
 ==================================================
-Toplam İncelenen Dosya: 8
-Toplam Satır: 2,830,743
-Toplam Eksik/Bozuk Satır: 2,867 (%0.1013)
-Toplam Zaman Atama (Injection) Süresi: 0.5372 sn
-Ortalama Üretim Hızı (Throughput): 5269496 satır/sn
+Total Files Analyzed: 8
+Total Rows: 2,830,743
+Total Missing/Corrupted Rows: 2,867 (0.1013%)
+Total Injection Time: 0.5418 sec
+Average Throughput: 5224784 rows/sec
 
---- GENEL EKSİK İÇEREN SÜTUNLAR ---
-  - Flow Bytes/s: 2,867 adet
-  - Flow Packets/s: 2,867 adet
+--- GLOBAL COLUMNS WITH MISSING DATA (TOP 5) ---
+  - Flow Bytes/s: 2,867 counts
+  - Flow Packets/s: 2,867 counts
 
---- GENEL LABEL DAĞILIMI ---
-  - BENIGN: 2,273,097 (%80.3004)
-  - DoS Hulk: 231,073 (%8.1630)
-  - PortScan: 158,930 (%5.6144)
-  - DDoS: 128,027 (%4.5227)
-  - DoS GoldenEye: 10,293 (%0.3636)
-  - FTP-Patator: 7,938 (%0.2804)
-  - SSH-Patator: 5,897 (%0.2083)
-  - DoS slowloris: 5,796 (%0.2048)
-  - DoS Slowhttptest: 5,499 (%0.1943)
-  - Bot: 1,966 (%0.0695)
-  - Web Attack ï¿½ Brute Force: 1,507 (%0.0532)
-  - Web Attack ï¿½ XSS: 652 (%0.0230)
-  - Infiltration: 36 (%0.0013)
-  - Web Attack ï¿½ Sql Injection: 21 (%0.0007)
-  - Heartbleed: 11 (%0.0004)
+--- GLOBAL LABEL DISTRIBUTION ---
+  - BENIGN: 2,273,097 (80.3004%)
+  - DoS Hulk: 231,073 (8.1630%)
+  - PortScan: 158,930 (5.6144%)
+  - DDoS: 128,027 (4.5227%)
+  - DoS GoldenEye: 10,293 (0.3636%)
+  - FTP-Patator: 7,938 (0.2804%)
+  - SSH-Patator: 5,897 (0.2083%)
+  - DoS slowloris: 5,796 (0.2048%)
+  - DoS Slowhttptest: 5,499 (0.1943%)
+  - Bot: 1,966 (0.0695%)
+  - Web Attack ï¿½ Brute Force: 1,507 (0.0532%)
+  - Web Attack ï¿½ XSS: 652 (0.0230%)
+  - Infiltration: 36 (0.0013%)
+  - Web Attack ï¿½ Sql Injection: 21 (0.0007%)
+  - Heartbleed: 11 (0.0004%)
 
---- GENEL EN ÇOK KULLANILAN İLK 5 PORT ---
-  - Port 53: 957,971 kayıt (%33.84)
-  - Port 80: 618,934 kayıt (%21.86)
-  - Port 443: 505,710 kayıt (%17.86)
-  - Port 123: 23,880 kayıt (%0.84)
-  - Port 22: 16,941 kayıt (%0.60)
+--- GLOBAL MOST USED PORTS (TOP 5) ---
+  - Port 53: 957,971 records (33.84%)
+  - Port 80: 618,934 records (21.86%)
+  - Port 443: 505,710 records (17.86%)
+  - Port 123: 23,880 records (0.84%)
+  - Port 22: 16,941 records (0.60%)
