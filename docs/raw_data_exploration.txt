@@ -1,0 +1,57 @@
+Bulunan dosya sayisi: 8
+
+data/Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv
+  Satir: 225,745  Kolon: 79
+Label
+BENIGN     97718
+DDoS      128027
+
+data/Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv
+  Satir: 286,467  Kolon: 79
+Label
+BENIGN      127537
+PortScan    158930
+
+data/Friday-WorkingHours-Morning.pcap_ISCX.csv
+  Satir: 191,033  Kolon: 79
+Label
+BENIGN    189067
+Bot         1966
+
+data/Monday-WorkingHours.pcap_ISCX.csv
+  Satir: 529,918  Kolon: 79
+Label
+BENIGN    529918
+
+data/Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv
+  Satir: 288,602  Kolon: 79
+Label
+BENIGN          288566
+Infiltration        36
+
+data/Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv
+  Satir: 170,366  Kolon: 79
+Label
+BENIGN                          168186
+Web Attack ï¿½ Brute Force        1507
+Web Attack ï¿½ Sql Injection        21
+Web Attack ï¿½ XSS                 652
+
+data/Tuesday-WorkingHours.pcap_ISCX.csv
+  Satir: 445,909  Kolon: 79
+Label
+BENIGN         432074
+FTP-Patator      7938
+SSH-Patator      5897
+
+data/Wednesday-workingHours.pcap_ISCX.csv
+  Satir: 692,703  Kolon: 79
+Label
+BENIGN              440031
+DoS GoldenEye        10293
+DoS Hulk            231073
+DoS Slowhttptest      5499
+DoS slowloris         5796
+Heartbleed              11
+
+=== TOPLAM SATIR (tum dosyalar): 2,830,743 ===
