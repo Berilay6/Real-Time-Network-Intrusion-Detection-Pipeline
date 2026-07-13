@@ -1,14 +1,14 @@
 """
-CICIDS2017 verisini okuyup Kafka'ya gercek zamanli stream olarak gonderir.
-Proposal'daki "Injected Timestamp" mantigini uygular: veri setinde gercek
-zaman bilgisi olmadigi icin, gonderim aninda her satira guncel timestamp
-eklenir.
+Reads the CICIDS2017 dataset and streams it to Kafka in real time.
+Implements the "Injected Timestamp" logic from the proposal: since the
+dataset has no real-time timestamp information, the current time is
+attached to each row at the moment it is sent.
 
-Kullanim:
+Usage:
   python3 producer/produce.py --file ../data/clean/Friday-WorkingHours-Morning.pcap_ISCX.csv --rate 100 --limit 5000
 
-  --rate  : saniyede kac satir gonderilecek (varsayilan: 50)
-  --limit : toplam kac satir gonderilecek, test icin (varsayilan: tum dosya)
+  --rate  : rows sent per second (default: 50)
+  --limit : total number of rows to send, for testing (default: entire file)
 """
 
 import argparse
@@ -25,14 +25,14 @@ TOPIC = "network-traffic"
 
 def delivery_report(err, msg):
     if err is not None:
-        print(f"Gonderim hatasi: {err}", file=sys.stderr)
+        print(f"Delivery failed: {err}", file=sys.stderr)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--file", required=True, help="Temizlenmis CSV dosya yolu")
-    parser.add_argument("--rate", type=int, default=50, help="Saniyede kac satir")
-    parser.add_argument("--limit", type=int, default=None, help="Maks satir sayisi")
+    parser.add_argument("--file", required=True, help="Path to the cleaned CSV file")
+    parser.add_argument("--rate", type=int, default=50, help="Rows per second")
+    parser.add_argument("--limit", type=int, default=None, help="Max number of rows")
     args = parser.parse_args()
 
     producer = Producer({"bootstrap.servers": BOOTSTRAP_SERVERS})
@@ -45,7 +45,7 @@ def main():
             if args.limit and sent >= args.limit:
                 break
 
-            # Injected Timestamp: gercek zamanli stream simulasyonu
+            # Injected Timestamp: simulates a real-time stream
             row["Injected_Timestamp"] = datetime.now(timezone.utc).isoformat()
 
             dst_port = row.get("Destination Port", "0")
@@ -57,12 +57,12 @@ def main():
 
             sent += 1
             if sent % 500 == 0:
-                print(f"  ... {sent:,} mesaj gonderildi", flush=True)
+                print(f"  ... {sent:,} messages sent", flush=True)
 
             time.sleep(delay)
 
     producer.flush()
-    print(f"\nTamamlandi. Toplam gonderilen: {sent:,} mesaj")
+    print(f"\nDone. Total sent: {sent:,} messages")
 
 
 if __name__ == "__main__":
