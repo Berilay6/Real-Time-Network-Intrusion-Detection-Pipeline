@@ -1,5 +1,9 @@
+-- replication_factor raised from 1 to 2 to match the 2-node Cassandra
+-- cluster: with factor 1, killing a node during the fault-tolerance test
+-- would genuinely destroy data instead of testing recovery from a replica.
+
 CREATE KEYSPACE IF NOT EXISTS intrusion_detection
-WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 1};
+WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};
 
 USE intrusion_detection;
 

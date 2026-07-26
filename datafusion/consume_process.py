@@ -26,7 +26,7 @@ from datafusion import SessionContext
 from cassandra.cluster import Cluster
 import uuid
 
-KAFKA_BOOTSTRAP = "localhost:9092"
+KAFKA_BOOTSTRAP = "localhost:9092,localhost:9093,localhost:9094"
 TOPIC = "network-traffic"
 CASSANDRA_HOST = "localhost"
 KEYSPACE = "intrusion_detection"

@@ -1,4 +1,3 @@
-
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.6.0
@@ -9,9 +8,16 @@ services:
     ports:
       - "2181:2181"
 
-  kafka:
+  # --- Kafka: 3 brokers (was 1) ---
+  # Each broker needs a unique KAFKA_BROKER_ID, a unique container_name/hostname,
+  # and its own host port for the PLAINTEXT_HOST listener. All three share the
+  # same Zookeeper ensemble and advertise themselves to each other over the
+  # internal PLAINTEXT listener (kafkaN:29092), which Docker's default bridge
+  # network resolves by container name.
+  kafka1:
     image: confluentinc/cp-kafka:7.6.0
-    container_name: kafka
+    container_name: kafka1
+    hostname: kafka1
     depends_on:
       - zookeeper
     ports:
@@ -19,20 +25,84 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      # 3 brokers now exist, so replicate the internal offsets topic across
+      # all of them instead of leaving it as a single point of failure.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
 
-  cassandra:
+  kafka2:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka2
+    hostname: kafka2
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka2:29092,PLAINTEXT_HOST://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+
+  kafka3:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: kafka3
+    hostname: kafka3
+    depends_on:
+      - zookeeper
+    ports:
+      - "9094:9094"
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka3:29092,PLAINTEXT_HOST://localhost:9094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_DEFAULT_REPLICATION_FACTOR: 3
+      KAFKA_MIN_INSYNC_REPLICAS: 2
+
+  # --- Cassandra: 2 nodes (was 1) ---
+  # cassandra1 is the seed node; cassandra2 joins the same cluster by pointing
+  # CASSANDRA_SEEDS at cassandra1's container name. Both must share the same
+  # CASSANDRA_CLUSTER_NAME. Host ports differ (9042 / 9043) since both containers
+  # bind 9042 internally.
+  cassandra1:
     image: cassandra:5.0
-    container_name: cassandra
+    container_name: cassandra1
+    hostname: cassandra1
     ports:
       - "9042:9042"
     environment:
       CASSANDRA_CLUSTER_NAME: intrusion-detection-cluster
+      CASSANDRA_SEEDS: cassandra1
+      CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
     volumes:
-      - cassandra_data:/var/lib/cassandra
+      - cassandra1_data:/var/lib/cassandra
+
+  cassandra2:
+    image: cassandra:5.0
+    container_name: cassandra2
+    hostname: cassandra2
+    depends_on:
+      - cassandra1
+    ports:
+      - "9043:9042"
+    environment:
+      CASSANDRA_CLUSTER_NAME: intrusion-detection-cluster
+      CASSANDRA_SEEDS: cassandra1
+      CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
+    volumes:
+      - cassandra2_data:/var/lib/cassandra
 
 volumes:
-  cassandra_data:
+  cassandra1_data:
+  cassandra2_data:

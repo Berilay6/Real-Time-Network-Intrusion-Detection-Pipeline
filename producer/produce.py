@@ -19,7 +19,7 @@ import sys
 from datetime import datetime, timezone
 from confluent_kafka import Producer
 
-BOOTSTRAP_SERVERS = "localhost:9092"
+BOOTSTRAP_SERVERS = "localhost:9092,localhost:9093,localhost:9094"
 TOPIC = "network-traffic"
 
 
