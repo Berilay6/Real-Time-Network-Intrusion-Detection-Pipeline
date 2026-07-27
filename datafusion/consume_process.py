@@ -83,6 +83,13 @@ def process_batch(rows, ctx, cassandra_session):
 
     window_delta = pd.Timedelta(**{WINDOW_SIZE + "s": 1})
 
+    # One batch_id per micro-batch. Without this, two different micro-batches
+    # landing on the same (dst_port, window_start) would overwrite each other
+    # (Cassandra INSERT is an upsert) instead of both being kept. See the
+    # comment in schema.cql for details; totals across batches for a given
+    # window are computed at query time via SUM(...) GROUP BY dst_port, window_start.
+    batch_id = uuid.uuid4()
+
     for _, row in anomalies.iterrows():
         event_time = row["Injected_Timestamp"]
         cassandra_session.execute("""
@@ -103,11 +110,12 @@ def process_batch(rows, ctx, cassandra_session):
         window_end = window_start + window_delta if pd.notna(window_start) else None
         cassandra_session.execute("""
             INSERT INTO windowed_traffic_metrics
-            (dst_port, window_start, window_end, total_flows, benign_count, attack_count, avg_flow_duration)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
+            (dst_port, window_start, batch_id, window_end, total_flows, benign_count, attack_count, avg_flow_duration)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """, (
             int(row["dst_port"]) if pd.notna(row["dst_port"]) else 0,
             window_start.to_pydatetime() if pd.notna(window_start) else datetime.now(timezone.utc),
+            batch_id,
             window_end.to_pydatetime() if window_end is not None else datetime.now(timezone.utc),
             int(row["total_flows"]),
             int(row["benign_count"]),

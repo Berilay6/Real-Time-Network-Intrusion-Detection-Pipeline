@@ -18,13 +18,20 @@ CREATE TABLE IF NOT EXISTS flagged_anomalies (
     PRIMARY KEY (dst_port, event_time, detection_id)
 ) WITH CLUSTERING ORDER BY (event_time DESC);
 
+-- batch_id added to the primary key: without it, two different micro-batches
+-- that happen to land in the same (dst_port, window_start) would silently
+-- overwrite each other (Cassandra INSERT is an upsert), discarding the
+-- earlier batch's counts. Each micro-batch now gets its own row; totals
+-- across batches for a given window are computed at query time via
+-- SUM(...) GROUP BY dst_port, window_start.
 CREATE TABLE IF NOT EXISTS windowed_traffic_metrics (
     dst_port        INT,
     window_start    TIMESTAMP,
+    batch_id        UUID,
     window_end      TIMESTAMP,
     total_flows     BIGINT,
     benign_count    BIGINT,
     attack_count    BIGINT,
     avg_flow_duration DOUBLE,
-    PRIMARY KEY (dst_port, window_start)
-) WITH CLUSTERING ORDER BY (window_start DESC);
+    PRIMARY KEY (dst_port, window_start, batch_id)
+) WITH CLUSTERING ORDER BY (window_start DESC, batch_id ASC);
