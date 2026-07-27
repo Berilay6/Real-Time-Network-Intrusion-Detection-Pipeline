@@ -83,16 +83,25 @@ services:
     container_name: cassandra1
     hostname: cassandra1
     ports:
-      - "9042:9042"
+      - "127.0.0.1:9042:9042"
     environment:
       CASSANDRA_CLUSTER_NAME: intrusion-detection-cluster
       CASSANDRA_SEEDS: cassandra1
       CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
       MAX_HEAP_SIZE: 512M
       HEAP_NEWSIZE: 100M
+      # Tell the driver to reach this node at 127.0.0.1 (its host-mapped
+      # address), not the container's internal Docker IP, which is
+      # unreachable from a script running on the host (e.g. in WSL2).
+      CASSANDRA_RPC_ADDRESS: 0.0.0.0
+      CASSANDRA_BROADCAST_RPC_ADDRESS: 127.0.0.1
     volumes:
       - cassandra1_data:/var/lib/cassandra
 
+  # cassandra2 is published on a different loopback IP (127.0.0.2) rather than
+  # a different port. This lets the Cassandra driver use a single `port=9042`
+  # with two contact-point addresses (127.0.0.1, 127.0.0.2), instead of needing
+  # per-host ports which the driver's Cluster() API doesn't support directly.
   cassandra2:
     image: cassandra:5.0
     container_name: cassandra2
@@ -100,13 +109,15 @@ services:
     depends_on:
       - cassandra1
     ports:
-      - "9043:9042"
+      - "127.0.0.2:9042:9042"
     environment:
       CASSANDRA_CLUSTER_NAME: intrusion-detection-cluster
       CASSANDRA_SEEDS: cassandra1
       CASSANDRA_ENDPOINT_SNITCH: SimpleSnitch
       MAX_HEAP_SIZE: 512M
       HEAP_NEWSIZE: 100M
+      CASSANDRA_RPC_ADDRESS: 0.0.0.0
+      CASSANDRA_BROADCAST_RPC_ADDRESS: 127.0.0.2
     volumes:
       - cassandra2_data:/var/lib/cassandra
 

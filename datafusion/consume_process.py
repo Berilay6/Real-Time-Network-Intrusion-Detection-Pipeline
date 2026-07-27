@@ -28,14 +28,19 @@ import uuid
 
 KAFKA_BOOTSTRAP = "localhost:9092,localhost:9093,localhost:9094"
 TOPIC = "network-traffic"
-CASSANDRA_HOST = "localhost"
+# Both Cassandra nodes are given as contact points (127.0.0.1 = cassandra1,
+# 127.0.0.2 = cassandra2, both on port 9042 -- see docker-compose.yml). This
+# is required for genuine fault tolerance: with only one contact point, the
+# driver has nowhere to fail over to if that node goes down mid-run, which is
+# exactly what caused a NoHostAvailable crash during fault-tolerance testing.
+CASSANDRA_CONTACT_POINTS = ["127.0.0.1", "127.0.0.2"]
 KEYSPACE = "intrusion_detection"
 
 WINDOW_SIZE = "second"  # date_trunc unit: tumbling window width (1 second)
 
 
 def get_cassandra_session():
-    cluster = Cluster([CASSANDRA_HOST])
+    cluster = Cluster(CASSANDRA_CONTACT_POINTS)
     session = cluster.connect(KEYSPACE)
     return cluster, session
 
