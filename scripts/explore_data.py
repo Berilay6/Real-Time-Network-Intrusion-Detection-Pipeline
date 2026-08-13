@@ -1,7 +1,5 @@
 """
 Performs exploratory data analysis on raw CICIDS2017 data (*.csv).
-Uses memory-friendly chunked reading to measure row/column counts, label distribution,
-port distribution, missing (NaN/Inf) data rates, and timestamp injection performance.
 """
 
 import pandas as pd
@@ -10,7 +8,6 @@ import glob
 import os
 import time
 
-# You can adjust this path based on where your data files are located
 RAW_DIR = "data" 
 OUT_PATH = "docs/raw_data_exploration.txt"
 CHUNK_SIZE = 50_000

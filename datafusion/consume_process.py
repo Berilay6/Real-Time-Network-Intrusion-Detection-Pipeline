@@ -6,15 +6,6 @@ Cassandra.
 Since DataFusion has no native Kafka streaming source, this script uses a
 micro-batching approach: the consumer accumulates messages, and once a batch
 is full, hands it to DataFusion as a DataFrame.
-
-Windowing: each record carries an `Injected_Timestamp` (added by the producer
-at send time). Instead of using the wall-clock time at which the batch happens
-to be processed, we truncate this event-time field to WINDOW_SIZE and group by
-it, so `window_start` / `window_end` reflect a real tumbling window derived
-from the data itself rather than an arbitrary processing-time snapshot.
-
-Usage:
-  python3 datafusion/consume_process.py --batch-size 50 --max-batches 5
 """
 
 import argparse
@@ -31,7 +22,7 @@ TOPIC = "network-traffic"
 CASSANDRA_HOST = "localhost"
 KEYSPACE = "intrusion_detection"
 
-WINDOW_SIZE = "second"  # date_trunc unit: tumbling window width (1 second)
+WINDOW_SIZE = "second" 
 
 
 def get_cassandra_session():
@@ -48,10 +39,6 @@ def process_batch(rows, ctx, cassandra_session):
     df["Flow Duration"] = pd.to_numeric(df["Flow Duration"], errors="coerce")
     df["Total Length of Fwd Packets"] = pd.to_numeric(df["Total Length of Fwd Packets"], errors="coerce")
 
-    # Injected_Timestamp: the real timestamp the producer attached to each row
-    # (ISO 8601 string). Parse it into an actual datetime so DataFusion can
-    # compute an event-time-based tumbling window instead of relying on
-    # processing time.
     df["Injected_Timestamp"] = pd.to_datetime(
         df["Injected_Timestamp"], utc=True, format="ISO8601", errors="coerce"
     )
@@ -68,7 +55,7 @@ def process_batch(rows, ctx, cassandra_session):
     """).to_pandas()
 
     # Tumbling window: round Injected_Timestamp down to WINDOW_SIZE and
-    # aggregate per window + port. window_start/window_end are now derived
+    # aggregate per window + port. window_start/window_end are derived
     # from the data's own event time, not from now() at processing time.
     metrics = batch_ctx.sql(f"""
         SELECT date_trunc('{WINDOW_SIZE}', "Injected_Timestamp") as window_start,

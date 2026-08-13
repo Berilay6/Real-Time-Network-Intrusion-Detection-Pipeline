@@ -18,6 +18,8 @@ The project went through two architectures:
   Track's fault-tolerance requirement, and what all current and future work
   in this repo uses.
 
+**You can find each architecture in their branches named as single-node and multi-node. Please make sure you are in the correct branch in the repository for the correct architecture!**
+
 Both are documented below so it's clear what changed and why. Only the
 multi-node setup is runnable as-is from this repo's files.
 
