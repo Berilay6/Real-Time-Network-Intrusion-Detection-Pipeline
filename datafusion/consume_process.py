@@ -6,15 +6,6 @@ Cassandra.
 Since DataFusion has no native Kafka streaming source, this script uses a
 micro-batching approach: the consumer accumulates messages, and once a batch
 is full, hands it to DataFusion as a DataFrame.
-
-Windowing: each record carries an `Injected_Timestamp` (added by the producer
-at send time). Instead of using the wall-clock time at which the batch happens
-to be processed, we truncate this event-time field to WINDOW_SIZE and group by
-it, so `window_start` / `window_end` reflect a real tumbling window derived
-from the data itself rather than an arbitrary processing-time snapshot.
-
-Usage:
-  python3 datafusion/consume_process.py --batch-size 50 --max-batches 5
 """
 
 import argparse
@@ -28,15 +19,11 @@ import uuid
 
 KAFKA_BOOTSTRAP = "localhost:9092,localhost:9093,localhost:9094"
 TOPIC = "network-traffic"
-# Both Cassandra nodes are given as contact points (127.0.0.1 = cassandra1,
-# 127.0.0.2 = cassandra2, both on port 9042 -- see docker-compose.yml). This
-# is required for genuine fault tolerance: with only one contact point, the
-# driver has nowhere to fail over to if that node goes down mid-run, which is
-# exactly what caused a NoHostAvailable crash during fault-tolerance testing.
+
 CASSANDRA_CONTACT_POINTS = ["127.0.0.1", "127.0.0.2"]
 KEYSPACE = "intrusion_detection"
 
-WINDOW_SIZE = "second"  # date_trunc unit: tumbling window width (1 second)
+WINDOW_SIZE = "second"  
 
 
 def get_cassandra_session():
@@ -48,15 +35,11 @@ def get_cassandra_session():
 def process_batch(rows, ctx, cassandra_session):
     df = pd.DataFrame(rows)
 
-    # Cast numeric columns (everything arrives as strings from Kafka/JSON)
+    # Cast numeric columns
     df["Destination Port"] = pd.to_numeric(df["Destination Port"], errors="coerce")
     df["Flow Duration"] = pd.to_numeric(df["Flow Duration"], errors="coerce")
     df["Total Length of Fwd Packets"] = pd.to_numeric(df["Total Length of Fwd Packets"], errors="coerce")
 
-    # Injected_Timestamp: the real timestamp the producer attached to each row
-    # (ISO 8601 string). Parse it into an actual datetime so DataFusion can
-    # compute an event-time-based tumbling window instead of relying on
-    # processing time.
     df["Injected_Timestamp"] = pd.to_datetime(
         df["Injected_Timestamp"], utc=True, format="ISO8601", errors="coerce"
     )
@@ -72,9 +55,7 @@ def process_batch(rows, ctx, cassandra_session):
         WHERE "Label" != 'BENIGN'
     """).to_pandas()
 
-    # Tumbling window: round Injected_Timestamp down to WINDOW_SIZE and
-    # aggregate per window + port. window_start/window_end are now derived
-    # from the data's own event time, not from now() at processing time.
+    # Tumbling window: round Injected_Timestamp down to WINDOW_SIZE and aggregate per window + port. 
     metrics = batch_ctx.sql(f"""
         SELECT date_trunc('{WINDOW_SIZE}', "Injected_Timestamp") as window_start,
                "Destination Port" as dst_port,
@@ -88,11 +69,6 @@ def process_batch(rows, ctx, cassandra_session):
 
     window_delta = pd.Timedelta(**{WINDOW_SIZE + "s": 1})
 
-    # One batch_id per micro-batch. Without this, two different micro-batches
-    # landing on the same (dst_port, window_start) would overwrite each other
-    # (Cassandra INSERT is an upsert) instead of both being kept. See the
-    # comment in schema.cql for details; totals across batches for a given
-    # window are computed at query time via SUM(...) GROUP BY dst_port, window_start.
     batch_id = uuid.uuid4()
 
     for _, row in anomalies.iterrows():

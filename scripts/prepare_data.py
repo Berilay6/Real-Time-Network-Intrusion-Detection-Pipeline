@@ -4,13 +4,11 @@ CICIDS2017 data preparation script.
 What it does:
   1. Reads the 8 raw files in data/*.csv (memory-friendly, using chunking)
   2. Strips leading/trailing whitespace from column names
-  3. Deduplicates duplicate column names (e.g., "Fwd Header Length") to make them unique
+  3. Deduplicates duplicate column names to make them unique
   4. Fixes encoding corruptions in the Label column (Web Attack types)
   5. Detects and removes corrupted rows containing missing (NaN) and infinite (Inf) values
   6. Saves the result under data/clean/ with the same filename
 
-Usage:
-  python3 scripts/prepare_data.py
 """
 
 import pandas as pd
@@ -56,7 +54,7 @@ def process_file(src_path: str, dst_path: str) -> int:
         if "Label" in chunk.columns:
             chunk["Label"] = chunk["Label"].apply(clean_label)
 
-        # 3. DATA QUALITY CONTROL (NEWLY ADDED SECTION)
+        # 3. DATA QUALITY CONTROL 
         # Convert infinite (Inf) values to NaN (Missing Data) format
         chunk.replace([np.inf, -np.inf], np.nan, inplace=True)
         # Drop all rows containing NaN values from the dataset
@@ -97,7 +95,7 @@ def main():
         except Exception as e:
             print(f"  ERROR: {e}", flush=True)
             if os.path.exists(dst):
-                os.remove(dst)  # Removing the incomplete file to avoid leaving partial data
+                os.remove(dst) 
 
     print(f"=== ALL OPERATIONS COMPLETED ===")
     print(f"Total clean rows ready to be sent to DataFusion and Kafka: {grand_total:,}\n", flush=True)

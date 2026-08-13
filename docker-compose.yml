@@ -28,8 +28,6 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      # 3 brokers now exist, so replicate the internal offsets topic across
-      # all of them instead of leaving it as a single point of failure.
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
       KAFKA_DEFAULT_REPLICATION_FACTOR: 3
       KAFKA_MIN_INSYNC_REPLICAS: 2
@@ -92,7 +90,7 @@ services:
       HEAP_NEWSIZE: 100M
       # Tell the driver to reach this node at 127.0.0.1 (its host-mapped
       # address), not the container's internal Docker IP, which is
-      # unreachable from a script running on the host (e.g. in WSL2).
+      # unreachable from a script running on the host .
       CASSANDRA_RPC_ADDRESS: 0.0.0.0
       CASSANDRA_BROADCAST_RPC_ADDRESS: 127.0.0.1
     volumes:

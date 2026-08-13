@@ -1,6 +1,3 @@
--- replication_factor raised from 1 to 2 to match the 2-node Cassandra
--- cluster: with factor 1, killing a node during the fault-tolerance test
--- would genuinely destroy data instead of testing recovery from a replica.
 
 CREATE KEYSPACE IF NOT EXISTS intrusion_detection
 WITH replication = {'class': 'SimpleStrategy', 'replication_factor': 2};
@@ -18,12 +15,7 @@ CREATE TABLE IF NOT EXISTS flagged_anomalies (
     PRIMARY KEY (dst_port, event_time, detection_id)
 ) WITH CLUSTERING ORDER BY (event_time DESC);
 
--- batch_id added to the primary key: without it, two different micro-batches
--- that happen to land in the same (dst_port, window_start) would silently
--- overwrite each other (Cassandra INSERT is an upsert), discarding the
--- earlier batch's counts. Each micro-batch now gets its own row; totals
--- across batches for a given window are computed at query time via
--- SUM(...) GROUP BY dst_port, window_start.
+
 CREATE TABLE IF NOT EXISTS windowed_traffic_metrics (
     dst_port        INT,
     window_start    TIMESTAMP,

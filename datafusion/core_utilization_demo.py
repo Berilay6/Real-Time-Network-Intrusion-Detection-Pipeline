@@ -1,11 +1,6 @@
 """
 Demonstrates how DataFusion distributes query execution across CPU cores.
 
-DataFusion parallelizes query execution via `target_partitions`: a query's
-physical plan is split into N independent execution partitions (N defaults
-to the number of CPU cores), each processed concurrently by DataFusion's
-Rust-native thread pool. This script shows both sides of that claim:
-
   1. The physical plan (via .explain()), showing RepartitionExec stages and
      the partition count DataFusion chose to use.
   2. Real, per-core CPU utilization sampled while a moderately expensive
@@ -32,8 +27,6 @@ except ImportError:
 
 
 def sample_cpu_during(fn, interval=0.1):
-    """Runs fn() in a background thread while sampling per-core CPU% on the
-    main thread. Returns (result, list_of_percpu_samples)."""
     samples = []
     result = {}
 
@@ -41,7 +34,7 @@ def sample_cpu_during(fn, interval=0.1):
         result["value"] = fn()
 
     t = threading.Thread(target=worker)
-    psutil.cpu_percent(percpu=True)  # prime the first (meaningless) reading
+    psutil.cpu_percent(percpu=True)  
     t.start()
     while t.is_alive():
         samples.append(psutil.cpu_percent(percpu=True, interval=interval))
